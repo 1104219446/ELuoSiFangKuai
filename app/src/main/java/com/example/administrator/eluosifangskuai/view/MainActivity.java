@@ -3,26 +3,19 @@ package com.example.administrator.eluosifangskuai.view;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Point;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.KeyEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -32,12 +25,6 @@ import android.widget.Toast;
 import com.example.administrator.eluosifangskuai.Config;
 import com.example.administrator.eluosifangskuai.R;
 import com.example.administrator.eluosifangskuai.control.GameControl;
-import com.example.administrator.eluosifangskuai.model.BoxModel;
-import com.example.administrator.eluosifangskuai.model.MapsModel;
-
-import java.util.Random;
-
-import javax.net.ssl.HandshakeCompletedEvent;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     //游戏区域组件
@@ -60,18 +47,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //获取读取储存卡权限
         isGrantExternalRW(this);
         //初始化UI Handler
-        inithander();
+        initHander();
         //实例化游戏控制器
         gameControl=new GameControl(handler,this);
         //初始化视图
         initView();
         //添加按钮监听器
         initLinstrner();
-        gameControl.musicModel.playbgm();
+        gameControl.musicModel.playBgm();
     }
     //UI线程Hander，用于更新UI组件
     @SuppressLint("HandlerLeak")
-    private void inithander() {
+    private void initHander() {
         if(handler==null) {
             handler = new Handler() {
                 @Override
@@ -131,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         textMaxScore=findViewById(R.id.text_maxscore);
         textNowScore=findViewById(R.id.text_nowscore);
         //实例化游戏区域
-        initgamePanel();
+        initGamePanel();
         //实例化下一块预览区域
         initnextPanel();
         //初始化背景
@@ -147,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     //实例化游戏区域
-    private void initgamePanel() {
+    private void initGamePanel() {
         FrameLayout layoutGame=findViewById(R.id.layoutGame);
         gamePanel=new SurfaceView(this) {
             @Override
@@ -179,7 +166,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         FrameLayout layoutNext=findViewById(R.id.layoutNext);
         layoutNext.addView(nextPanel);
     }
-
     //点击事件
     @Override
     public void onClick(View view) {
@@ -193,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode==KeyEvent.KEYCODE_BACK){
-            gameControl.musicModel.Pausebgm();
+            gameControl.musicModel.pauseBgm();
         }
         return super.onKeyDown(keyCode, event);
     }
@@ -201,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onRestart() {
         super.onRestart();
-        gameControl.musicModel.playbgm();
+        gameControl.musicModel.playBgm();
     }
 
     //安卓6.0以上读取内存文件需要手动请求权限

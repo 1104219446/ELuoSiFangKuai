@@ -2,29 +2,46 @@ package com.example.administrator.eluosifangskuai.control;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
+import com.example.administrator.eluosifangskuai.Config;
 import com.example.administrator.eluosifangskuai.model.BoxModel;
 import com.example.administrator.eluosifangskuai.model.MapsModel;
 
 public class DrawControl {
 
     private BoxModel boxModel;
+
     private MapsModel mapsModel;
+    //地图
+    private int[][] maps;
+    private Paint mapPaint;
+    private Paint linePaint;
+    private Paint statePaint;
+    private int boxSize;
+
     //游戏过程变量
     private boolean isPause=false;
-    private boolean isover=false;
-    private boolean  isopenfz=true;
+    private boolean isOver =false;
+    private boolean isOpenfz =true;
 
     public DrawControl(BoxModel boxModel1,MapsModel mapsModel1){
         boxModel=boxModel1;
         mapsModel=mapsModel1;
+        if(mapsModel!=null){
+            maps=mapsModel.maps;
+            mapPaint =mapsModel.getMapPaint();
+            linePaint =mapsModel.getLinePaint();
+            statePaint =mapsModel.getStatePaint();
+            boxSize=mapsModel.boxSize;
+        }
     }
 
     //定位预览方块
-    public boolean preMove() {
+    private boolean preMove() {
         if(boxModel.preboxs==null)
             return false;
         //移动成功 不作处理
@@ -61,14 +78,14 @@ public class DrawControl {
         boxModel.drawBoxs(canvas);
         //预览方块绘制
         boxModel.drawpreboxs(canvas);
-        if(!isopenfz) {
+        if(!isOpenfz) {
             //地图辅助线
-            mapsModel.drawLines(canvas);
+            drawLines(canvas);
         }
         //绘制地图
-        mapsModel.drawMaps(canvas);
+        drawMaps(canvas);
         //绘制状态
-        mapsModel.drawState(canvas,isPause,isover);
+        drawState(canvas,isPause, isOver);
     }
     //绘制下一块预览区域
     public void drawNext(Canvas canvas, int width) {
@@ -99,19 +116,65 @@ public class DrawControl {
         isPause = pause;
     }
 
-    public boolean isIsover() {
-        return isover;
+    public boolean isOver() {
+        return isOver;
     }
 
-    public void setIsover(boolean isover) {
-        this.isover = isover;
+    public void setOver(boolean over) {
+        this.isOver = over;
     }
 
-    public boolean isIsopenfz() {
-        return isopenfz;
+    public boolean isOpenfz() {
+        return isOpenfz;
     }
 
-    public void setIsopenfz(boolean isopenfz) {
-        this.isopenfz = isopenfz;
+    public void setOpenfz(boolean openfz) {
+        this.isOpenfz = openfz;
     }
+    //绘制地图
+    private void drawMaps(Canvas canvas) {
+        if(maps!=null) {
+            //已存在方块的绘制
+            for (int i = 0; i < maps.length; i++) {
+                for (int j = 0; j < maps[i].length; j++) {
+                    if (maps[i][j]>=0) {
+                        mapPaint.setColor(Config.COLORID[maps[i][j]]);
+                        canvas.drawRect(i * boxSize + 2,
+                                j * boxSize + 2,
+                                i * boxSize + boxSize - 2,
+                                j * boxSize + boxSize - 2,
+                                mapPaint);
+                    }
+                }
+            }
+        }
+    }
+    //绘制辅助线
+    private void drawLines(Canvas canvas) {
+        //游戏界面绘制
+        for(int i=0;i<maps.length;i++) {
+            canvas.drawLine(i*boxSize,0,i*boxSize,
+                    mapsModel.getyHeight(), linePaint);
+        }
+        for(int i=0;i<maps[0].length;i++) {
+            canvas.drawLine(0,i*boxSize,mapsModel.getxWidth(),
+                    i*boxSize, linePaint);
+        }
+    }
+    //绘制暂停或死亡状态
+    private void drawState(Canvas canvas,boolean isPause,boolean isover) {
+        if(isPause){
+            if(!isover) {
+                canvas.drawText("暂停了耶QWQ",
+                        mapsModel.getxWidth() / 2 - statePaint.measureText("暂停了耶QWQ") / 2,
+                        mapsModel.getyHeight() / 2, statePaint);
+            }
+        }
+        if(isover) {
+            canvas.drawText("游戏结束",
+                    mapsModel.getxWidth()/2 - statePaint.measureText("游戏结束")/2,
+                    mapsModel.getyHeight()/2, statePaint);
+        }
+    }
+
 }

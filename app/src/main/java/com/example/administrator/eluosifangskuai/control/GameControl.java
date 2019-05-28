@@ -2,8 +2,6 @@ package com.example.administrator.eluosifangskuai.control;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Point;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
@@ -17,6 +15,7 @@ import com.example.administrator.eluosifangskuai.model.BoxModel;
 import com.example.administrator.eluosifangskuai.model.MapsModel;
 import com.example.administrator.eluosifangskuai.model.MusicModel;
 import com.example.administrator.eluosifangskuai.model.ScoreModel;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -42,35 +41,35 @@ public class GameControl {
     private DrawControl drawControl=null;
 
     //自动下落线程
-    public Thread downthread;
+    private Thread downThread;
     //播放音乐
-    private boolean ismusic_on=true;
+    private boolean musicOn=true;
     //游戏过程变量
-    private boolean isPause=false;
-    private boolean isover=false;
-    private boolean  isopenfz=true;
+    private boolean gamePause =false;
+    private boolean gameOver =false;
+    private boolean openFZ=true;
     //UI Handler用与更新UI组件
     private Handler  handler=null;
     //游戏时间管理相关
-    Timer timer=null;
-    TimerTask timerTask=null;
+    private Timer levelTimer;
+    private TimerTask levelTimerTask;
     //30秒
-    int time_interval=30;
+    private int levelTimeInterval=30;
     //当前时间
-    int timesecond=0;
+    private int timeTick=0;
 
     public GameControl(Handler handler,Context context) {
         this.handler=handler;
         this.context=context;
         this.initDate(context);
-        timer=new Timer();
-        timerTask=new TimerTask() {
+        levelTimer =new Timer();
+        levelTimerTask =new TimerTask() {
             @Override
             public void run() {
-                if(!isPause&&!isover) {
-                     timesecond+=1;
-                    if(timesecond>=1000000){
-                     timesecond=0;
+                if(!gamePause &&!gameOver) {
+                     timeTick +=1;
+                    if(timeTick >=1000000){
+                     timeTick =0;
                     }
                 }
             }
@@ -78,11 +77,11 @@ public class GameControl {
     }
     /** 开始游戏 **/
     private void startGame() {
-        if(downthread==null) {
+        if(downThread ==null) {
             //初始化线程
             initThread();
             boxModel.newboxs();
-            isPause=false;
+            gamePause =false;
             scoreModel.updateScoreMax();
         } else {
             //如果游戏结束
@@ -93,7 +92,7 @@ public class GameControl {
     private void checkUpgrade(){
         if(scoreModel.checkaddLevel()){
             //播放音效
-            musicModel.playsounds(MusicModel.LEVELUP);
+            musicModel.playSounds(MusicModel.LEVELUP);
             Message msg=new Message();
             msg.obj="Levelup";
             handler.sendMessage(msg);
@@ -104,7 +103,7 @@ public class GameControl {
         int lines=mapsModel.cleanLine();
         if(lines!=0) {
             //播放消行音效
-            musicModel.playsounds(MusicModel.CLEARLINES);
+            musicModel.playSounds(MusicModel.CLEARLINES);
         }
         //加分
         scoreModel.addScore(lines);
@@ -112,7 +111,7 @@ public class GameControl {
 
     //初始化线程
     private void initThread(){
-        downthread=new Thread() {
+        downThread =new Thread() {
             @Override
             public void run() {
                 //分值初始化
@@ -120,14 +119,14 @@ public class GameControl {
                 //关卡初始化
                 scoreModel.level=0;
                 //定时器初始化
-                timer.schedule(timerTask,time_interval*1050, 1050);
+                levelTimer.schedule(levelTimerTask, levelTimeInterval *1050, 1050);
                 while(true) {
                     SystemClock.sleep(600-scoreModel.level*20);
-                    if(isover&&musicModel.player.isPlaying()){
-                        musicModel.Pausebgm();
+                    if(gameOver &&musicModel.getPlayer().isPlaying()){
+                        musicModel.pauseBgm();
                     }
                     //没死的逻辑
-                    if(!isover) {
+                    if(!gameOver) {
                         //检测是否加行
                         checkaddlines();
                         //检测是否游戏升级
@@ -140,12 +139,12 @@ public class GameControl {
                 }
             }
         };
-        downthread.start();
+        downThread.start();
     }
 
     //方块下落逻辑处理
     private void boxsDownLogic(){
-        if (!isPause) {
+        if (!gamePause) {
             //下落一次
             if (!boxModel.move(0, 1, mapsModel)) {
                 //获取当前方块颜色
@@ -157,7 +156,7 @@ public class GameControl {
                 boxModel.newboxs();
                 drawControl.updatepreBoxs();
             }
-            isover=checkgameover();
+            gameOver =checkgameover();
             Message msg=new Message();
             msg.obj="invalidate";
             if(handler!=null)
@@ -167,32 +166,32 @@ public class GameControl {
 
     //游戏结束逻辑
     private void gameOverLogic(){
-        if(isover) {
-            if(!musicModel.player.isPlaying()&&ismusic_on){
-                musicModel.playbgm();
+        if(gameOver) {
+            if(!musicModel.getPlayer().isPlaying()&& musicOn){
+                musicModel.playBgm();
             }
             //初始化地图
             mapsModel.cleanMaps();
             boxModel.newboxs();
-            isover = false;
-            isPause = false;
+            gameOver = false;
+            gamePause = false;
             scoreModel.score=0;
             scoreModel.level=0;
             Message msg=new Message();
             msg.obj="Levelup";
             handler.sendMessage(msg);
             scoreModel.updateScoreMax();
-            timesecond=0;
+            timeTick =0;
         }
     }
 
     //检测是否加一行
     private void checkaddlines() {
-        if(!isover&&!isPause){
-            if(timesecond!=0&&timesecond%time_interval==0){
-                timesecond++;
+        if(!gameOver &&!gamePause){
+            if(timeTick !=0&& timeTick % levelTimeInterval ==0){
+                timeTick++;
                 //播放音效并加一行
-                musicModel.playsounds(MusicModel.ADDLINES);
+                musicModel.playSounds(MusicModel.ADDLINES);
                 mapsModel.addLines();
                 //更新预览方块
                 drawControl.updatepreBoxs();
@@ -201,7 +200,7 @@ public class GameControl {
     }
 
     //下移方块
-    public boolean moveButton() {
+    private boolean moveButton() {
         if(boxModel.boxs==null)
             return false;
         //移动成功 不作处理
@@ -220,7 +219,7 @@ public class GameControl {
         lines=mapsModel.cleanLine();
         if(lines!=0){
             //播放消行音效
-            musicModel.playsounds(MusicModel.CLEARLINES);
+            musicModel.playSounds(MusicModel.CLEARLINES);
         }
         //加分
         scoreModel.addScore(lines);
@@ -231,15 +230,14 @@ public class GameControl {
         //更新预览方块
         drawControl.updatepreBoxs();
         //游戏结束检测
-        isover=checkgameover();
+        gameOver =checkgameover();
         return false;
     }
-
     //检测死亡
-    public boolean checkgameover() {
+    private boolean checkgameover() {
         for(int i=0;i<boxModel.boxs.length;i++) {
             if(mapsModel.maps[boxModel.boxs[i].x][boxModel.boxs[i].y]>=0) {
-                musicModel.playsounds(MusicModel.GAMEOVER);
+                musicModel.playSounds(MusicModel.GAMEOVER);
                 return true;
             }
         }
@@ -247,10 +245,10 @@ public class GameControl {
     }
     //设置暂停
     private void setPause() {
-        if(!isover) {
-            isPause = !isPause;
+        if(!gameOver) {
+            gamePause = !gamePause;
             Message msg = new Message();
-            if (isPause) {
+            if (gamePause) {
                 msg.obj = "continue";
             } else {
                 msg.obj = "pause";
@@ -288,7 +286,7 @@ public class GameControl {
 
     }
     //获取屏幕宽度
-    public static int getScreenWidth(Context context) {
+    private static int getScreenWidth(Context context) {
         WindowManager wm=(WindowManager)context
                 .getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics outMetrics=new DisplayMetrics();
@@ -301,34 +299,34 @@ public class GameControl {
     public void onClick(int id) {
         if(id!=R.id.btn_up){
             //播放按钮音效
-            musicModel.playsounds(MusicModel.CLICKBUTTON);
+            musicModel.playSounds(MusicModel.CLICKBUTTON);
         }
         switch (id) {
             case R.id.btn_down:
-                if(isPause||isover)
+                if(gamePause || gameOver)
                     return;
                 while(moveButton()) {
                 }
                 break;
             case R.id.btn_left:
-                if(isPause||isover)
+                if(gamePause || gameOver)
                     return;
                 boxModel.move(-1,0,mapsModel);
                 break;
             case R.id.btn_right:
-                if(isPause||isover)
+                if(gamePause || gameOver)
                     return;
                 boxModel.move(1,0,mapsModel);
                 break;
             case R.id.btn_onedown:
-                if(isPause||isover)
+                if(gamePause || gameOver)
                     return;
                 boxModel.move(0,1,mapsModel);
                 break;
             case R.id.btn_up:
                 //播放旋转音效
-                musicModel.playsounds(MusicModel.ROTATE);
-                if(isPause||isover)
+                musicModel.playSounds(MusicModel.ROTATE);
+                if(gamePause || gameOver)
                     return;
                 boxModel.rotate(mapsModel);
                 break;
@@ -343,14 +341,14 @@ public class GameControl {
                 setfz();
                 break;
             case R.id.btn_music:
-                ismusic_on=!ismusic_on;
+                musicOn =!musicOn;
                 Message msg=new Message();
-                if(musicModel.player.isPlaying()||!ismusic_on) {
-                    musicModel.Pausebgm();
+                if(musicModel.getPlayer().isPlaying()||!musicOn) {
+                    musicModel.pauseBgm();
                     msg.obj="music_off";
                 }else{
-                    if(!isover&&ismusic_on) {
-                        musicModel.playbgm();
+                    if(!gameOver && musicOn) {
+                        musicModel.playBgm();
                     }
                     msg.obj="music_on";
                 }
@@ -361,13 +359,14 @@ public class GameControl {
     }
     //设置辅助线
     private void setfz() {
-        drawControl.setIsopenfz(!drawControl.isIsopenfz());
+        drawControl.setOpenfz(!drawControl.isOpenfz());
         Message msg=new Message();
-        msg.obj=isopenfz?"fzclose":"fzopen";
+        msg.obj= openFZ ?"fzclose":"fzopen";
         handler.sendMessage(msg);
     }
 
     public DrawControl getDrawControl() {
         return drawControl;
     }
+
 }

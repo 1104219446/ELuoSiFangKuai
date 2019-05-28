@@ -1,6 +1,5 @@
 package com.example.administrator.eluosifangskuai.model;
 
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
@@ -18,15 +17,15 @@ public class MapsModel {
     //方块大小
     public int boxSize;
     //地图画笔
-    Paint mappaint=null;
+    private Paint mapPaint;
     //画线笔
-    Paint linepaint=null;
+    private Paint linePaint;
     //画状态笔
-    Paint statepaint=null;
+    private Paint statePaint;
     //游戏区域的高度
-    int yHeight;
+    private int yHeight;
     //游戏区域宽度
-    int xWidth;
+    private int xWidth;
     //初始化地图模型
     public MapsModel(int yHeight, int xWidth, int boxsize) {
         this.yHeight=yHeight;
@@ -38,62 +37,18 @@ public class MapsModel {
     }
     //实例化画笔
     private void initallpaint() {
-        linepaint=new Paint();
-        linepaint.setColor(Color.BLACK);
-        linepaint.setAntiAlias(true);
-        mappaint=new Paint();
-        mappaint.setAntiAlias(true);
-        mappaint.setColor(Color.BLUE);
-        statepaint=new Paint();
-        statepaint.setAntiAlias(true);
-        statepaint.setColor(Color.RED);
-        statepaint.setTextSize(100f);
+        linePaint =new Paint();
+        linePaint.setColor(Color.BLACK);
+        linePaint.setAntiAlias(true);
+        mapPaint =new Paint();
+        mapPaint.setAntiAlias(true);
+        mapPaint.setColor(Color.BLUE);
+        statePaint =new Paint();
+        statePaint.setAntiAlias(true);
+        statePaint.setColor(Color.RED);
+        statePaint.setTextSize(100f);
     }
-    //绘制地图
-    public void drawMaps(Canvas canvas) {
-        if(maps!=null) {
-            //已存在方块的绘制
-            for (int i = 0; i < maps.length; i++) {
-                for (int j = 0; j < maps[i].length; j++) {
-                    if (maps[i][j]>=0) {
-                        mappaint.setColor(Config.COLORID[maps[i][j]]);
-                        canvas.drawRect(i * boxSize + 2,
-                                j * boxSize + 2,
-                                i * boxSize + boxSize - 2,
-                                j * boxSize + boxSize - 2,
-                                mappaint);
-                    }
-                }
-            }
-        }
-    }
-    //绘制辅助线
-    public void drawLines(Canvas canvas) {
-        //游戏界面绘制
-        for(int i=0;i<maps.length;i++) {
-            canvas.drawLine(i*boxSize,0,i*boxSize,
-                    yHeight,linepaint);
-        }
-        for(int i=0;i<maps[0].length;i++) {
-            canvas.drawLine(0,i*boxSize,xWidth,
-                    i*boxSize,linepaint);
-        }
-    }
-    //绘制暂停或死亡状态
-    public void drawState(Canvas canvas,boolean isPause,boolean isover) {
-        if(isPause){
-            if(!isover) {
-                canvas.drawText("暂停了耶QWQ",
-                        xWidth / 2 - statepaint.measureText("暂停了耶QWQ") / 2,
-                        yHeight / 2, statepaint);
-            }
-        }
-        if(isover) {
-            canvas.drawText("游戏结束",
-                    xWidth/2 -statepaint.measureText("游戏结束")/2,
-                    yHeight/2,statepaint);
-        }
-    }
+
     //清除地图
     public void cleanMaps() {
         for(int x=0;x<maps.length;x++)
@@ -159,5 +114,45 @@ public class MapsModel {
                 }
             }
         }
+    }
+
+    public Paint getMapPaint() {
+        return mapPaint;
+    }
+
+    public void setMapPaint(Paint mapPaint) {
+        this.mapPaint = mapPaint;
+    }
+
+    public Paint getLinePaint() {
+        return linePaint;
+    }
+
+    public void setLinePaint(Paint linePaint) {
+        this.linePaint = linePaint;
+    }
+
+    public Paint getStatePaint() {
+        return statePaint;
+    }
+
+    public void setStatePaint(Paint statePaint) {
+        this.statePaint = statePaint;
+    }
+
+    public int getyHeight() {
+        return yHeight;
+    }
+
+    public void setyHeight(int yHeight) {
+        this.yHeight = yHeight;
+    }
+
+    public int getxWidth() {
+        return xWidth;
+    }
+
+    public void setxWidth(int xWidth) {
+        this.xWidth = xWidth;
     }
 }

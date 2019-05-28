@@ -9,6 +9,7 @@ import android.media.SoundPool;
 import android.os.Build;
 
 import com.example.administrator.eluosifangskuai.R;
+import com.example.administrator.eluosifangskuai.single.MediaPlayerSingle;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -19,11 +20,11 @@ import java.util.HashMap;
 
 public class MusicModel {
     //音乐播放器
-    public MediaPlayer player=null;
+    private MediaPlayer player=null;
     //音效播放器
-    SoundPool soundPool=null;
+    private SoundPool soundPool=null;
     //音效ID
-    HashMap<Integer,Integer> soundsID=null;
+    private HashMap<Integer,Integer> soundsID=null;
 
     //游戏音效资源
     public static final int ROTATE=0;
@@ -54,7 +55,7 @@ public class MusicModel {
     @SuppressLint("UseSparseArrays")
     private void initPlayer(Context context) {
         //创建音乐播放器
-        player=MediaPlayer.create(context,R.raw.bgm1);
+        player=MediaPlayerSingle.getInstance(context);
         //设置循环播放
         player.setLooping(true);
         //整形可以直接用<>
@@ -78,19 +79,24 @@ public class MusicModel {
         }
     }
     //播放BGM
-    public void playbgm() {
+    public void playBgm() {
         player.start();
     }
     //播放ID号音效
-    public void playsounds(int id) {
+    public void playSounds(int id){
         soundPool.play(soundsID.get(id),1,
                 1,1,0,1);
     }
     //暂停BGM
-    public void Pausebgm(){
+    public void pauseBgm(){
         if(player.isPlaying()){
             player.pause();
         }
     }
+
+    public MediaPlayer getPlayer() {
+        return player;
+    }
+
 
 }
