@@ -3,10 +3,11 @@ package com.example.administrator.eluosifangskuai.model.inf;
 import android.graphics.Point;
 
 public interface BoxTypeStrategy {
-    public Point[] getBoxT();
 
-    public int getBoxType();
+    Point[] getBoxT();
 
-    public void setBoxType(int type);
+    int getBoxType();
+
+    void setBoxType(int type);
 
 }

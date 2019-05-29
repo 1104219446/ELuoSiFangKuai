@@ -4,8 +4,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.util.Log;
 
 import com.example.administrator.eluosifangskuai.Config;
+import com.example.administrator.eluosifangskuai.control.BoxFactory;
 import com.example.administrator.eluosifangskuai.control.ProduceBox;
 import com.example.administrator.eluosifangskuai.model.impl.FakeBoomBox;
 import com.example.administrator.eluosifangskuai.model.impl.IBox;
@@ -27,27 +29,26 @@ import java.util.Random;
 
 public class BoxModel {
     //方块
-    public Point[] boxs=null;
+    public Point[] boxs;
     //类型
-    public int boxtype=0;
+    public int boxtype;
     //方块大小
     public int boxSize;
     //方块画笔
-    public Paint boxpaint=null;
+    public Paint boxpaint;
     //预览方块画笔
-    public Paint preboxpaint=null;
+    public Paint preboxpaint;
     //下一块方块画笔
-    public Paint nextpaint=null;
+    public Paint nextpaint;
     //下一块方块
     public ProduceBox nextProduceBox;
     //下一块方块类型
     public int boxNextType;
     //下一块方块格子大小
     public int boxNextSize;
-    //随机数
-    private Random random=new Random();
     //预览方块
-    public ArrayList<Point> preboxs=null;
+    public ArrayList<Point> preboxs;
+
     public BoxModel(int boxsize) {
         this.boxSize=boxsize;
         boxpaint=new Paint();
@@ -65,7 +66,6 @@ public class BoxModel {
     //生成新方块
     public void newboxs() {
         if(nextProduceBox ==null){
-            nextProduceBox =new ProduceBox();
             newBoxsNext();
         }
         //赋值当前方块
@@ -80,66 +80,11 @@ public class BoxModel {
     }
     //生成下一块方块
     private void newBoxsNext() {
-        //生成下一块方块
-        boxNextType=random.nextInt(8);
-
+        nextProduceBox =BoxFactory.getRandomNextBox();
+        Log.d("dd", "newBoxsNext: "+nextProduceBox.getBoxTypeStrategy().getBoxType());
         //设置画笔颜色
-        boxpaint.setColor(Config.COLORID[boxNextType]);
-        switch (boxNextType) {
-            //田
-            case 0:
-                nextProduceBox.setBoxTypeStrategy(new TianBox());
-                break;
-            //L
-            case 1:
-                nextProduceBox.setBoxTypeStrategy(new LBox());
-                break;
-            //反L
-            case 2:
-                nextProduceBox.setBoxTypeStrategy(new ReverseLBox());
-                break;
-            //S
-            case 3:
-                nextProduceBox.setBoxTypeStrategy(new SBox());
-                break;
-            //Z
-            case 4:
-                nextProduceBox.setBoxTypeStrategy(new ZBox());
-                break;
-            //I
-            case 5:
-                nextProduceBox.setBoxTypeStrategy(new IBox());
-                break;
-            //T
-            case 6:
-                nextProduceBox.setBoxTypeStrategy(new TBox());
-                break;
-            //两点
-            case 7:
-                nextProduceBox.setBoxTypeStrategy(new TwoPointBox());
-                break;
-            //假炸弹
-            case 8:
-                nextProduceBox.setBoxTypeStrategy(new FakeBoomBox());
-                break;
-        }
-        //设置下一块方块类型
-        nextProduceBox.getBoxTypeStrategy().setBoxType(boxNextType);
+        boxpaint.setColor(Config.COLORID[nextProduceBox.getBoxTypeStrategy().getBoxType()]);
 
-    }
-    //画方块
-    public void drawBoxs(Canvas canvas) {
-        if(boxs!=null) {
-            boxpaint.setColor(Config.COLORID[boxtype]);
-            //方块绘制
-            for (int i = 0; i < boxs.length; i++) {
-                canvas.drawRect(boxs[i].x * boxSize + 2,
-                        boxs[i].y * boxSize + 2,
-                        boxs[i].x * boxSize + boxSize - 2,
-                        boxs[i].y * boxSize + boxSize - 2,
-                        boxpaint);
-            }
-        }
     }
     //移动当前方块
     public boolean move(int x, int y,MapsModel mapsModel) {
@@ -214,63 +159,4 @@ public class BoxModel {
         }
         return true;
     }
-    //画下一块方块
-    public void drawNext(Canvas canvas, int width) {
-        if(boxNextSize==0){
-            boxNextSize=width/5;
-        }
-        if(nextProduceBox !=null) {
-            for(int i = 0; i< nextProduceBox.getBoxTypeStrategy().getBoxT().length; i++)
-            {
-                int xx= nextProduceBox.getBoxTypeStrategy().getBoxT()[i].x;
-                int yy= nextProduceBox.getBoxTypeStrategy().getBoxT()[i].y;
-                xx-=3;
-                switch (boxNextType){
-                    //田
-                    case 0:xx+=1;yy+=1;break;
-                    //L
-                    case 1:xx+=1;yy+=1;break;
-                    //反L
-                    case 2:xx+=1;yy+=1;break;
-                    //S
-                    case 3:yy+=1;break;
-                    //Z
-                    case 4:yy+=1;break;
-                    //I
-                    case 5:yy+=2;break;
-                    //T
-                    case 6:yy+=1;break;
-                    //两点
-                    case 7:xx+=1;yy+=2;break;
-                    //一点
-                    case 8:xx+=1;yy+=2;break;
-                    default:break;
-                }
-                nextpaint.setColor(Config.COLORID[boxNextType]);
-                nextpaint.setAlpha(128);
-                canvas.drawRect((xx)*boxNextSize + 2,
-                        yy*boxNextSize + 2,
-                        (xx+1)*boxNextSize - 2,
-                        (yy+1)*boxNextSize - 2,
-                        nextpaint
-                        );
-            }
-        }
-    }
-    //画预览方块
-    public void drawpreboxs(Canvas canvas){
-        preboxpaint.setColor(boxpaint.getColor());
-        preboxpaint.setAlpha(25);
-        if(preboxs!=null) {
-            //方块绘制
-            for (int i = 0; i < preboxs.size(); i++) {
-                canvas.drawRect(preboxs.get(i).x * boxSize + 2,
-                        preboxs.get(i).y * boxSize + 2,
-                        preboxs.get(i).x * boxSize + boxSize - 2,
-                        preboxs.get(i).y * boxSize + boxSize - 2,
-                        preboxpaint);
-            }
-        }
-    }
-
 }

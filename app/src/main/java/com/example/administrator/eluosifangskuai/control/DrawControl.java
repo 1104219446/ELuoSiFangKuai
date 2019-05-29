@@ -11,6 +11,8 @@ import com.example.administrator.eluosifangskuai.Config;
 import com.example.administrator.eluosifangskuai.model.BoxModel;
 import com.example.administrator.eluosifangskuai.model.MapsModel;
 
+import java.util.ArrayList;
+
 public class DrawControl {
 
     private BoxModel boxModel;
@@ -22,7 +24,6 @@ public class DrawControl {
     private Paint linePaint;
     private Paint statePaint;
     private int boxSize;
-
     //游戏过程变量
     private boolean isPause=false;
     private boolean isOver =false;
@@ -75,9 +76,9 @@ public class DrawControl {
     //绘制游戏区域
     public void draw(Canvas canvas) {
         //方块绘制
-        boxModel.drawBoxs(canvas);
+        drawBoxs(canvas);
         //预览方块绘制
-        boxModel.drawpreboxs(canvas);
+        drawpreboxs(canvas);
         if(!isOpenfz) {
             //地图辅助线
             drawLines(canvas);
@@ -89,7 +90,7 @@ public class DrawControl {
     }
     //绘制下一块预览区域
     public void drawNext(Canvas canvas, int width) {
-        boxModel.drawNext(canvas,width);
+        drawNextBox(canvas,width);
     }
 
     public BoxModel getBoxModel() {
@@ -174,6 +175,82 @@ public class DrawControl {
             canvas.drawText("游戏结束",
                     mapsModel.getxWidth()/2 - statePaint.measureText("游戏结束")/2,
                     mapsModel.getyHeight()/2, statePaint);
+        }
+    }
+    //画方块
+    private void drawBoxs(Canvas canvas) {
+        Point[]boxs=boxModel.boxs;
+        if(boxs!=null) {
+            boxModel.boxpaint.setColor(Config.COLORID[boxModel.boxtype]);
+            //方块绘制
+            for (int i = 0; i < boxs.length; i++) {
+                canvas.drawRect(boxs[i].x * boxSize + 2,
+                        boxs[i].y * boxSize + 2,
+                        boxs[i].x * boxSize + boxSize - 2,
+                        boxs[i].y * boxSize + boxSize - 2,
+                        boxModel.boxpaint);
+            }
+        }
+    }
+    //画下一块方块
+    private void drawNextBox(Canvas canvas, int width) {
+        int boxNextSize=boxModel.boxNextSize;
+        if(boxNextSize==0){
+            boxNextSize=width/5;
+        }
+        if(boxModel.nextProduceBox !=null) {
+            for(int i = 0; i< boxModel.nextProduceBox.getBoxTypeStrategy().getBoxT().length; i++)
+            {
+                int xx= boxModel.nextProduceBox.getBoxTypeStrategy().getBoxT()[i].x;
+                int yy= boxModel.nextProduceBox.getBoxTypeStrategy().getBoxT()[i].y;
+                xx-=4;
+                switch (boxModel.boxNextType){
+                    //田
+                    case 0:xx+=1;yy+=1;break;
+                    //L
+                    case 1:xx+=1;yy+=1;break;
+                    //反L
+                    case 2:xx+=1;yy+=1;break;
+                    //S
+                    case 3:yy+=1;break;
+                    //Z
+                    case 4:yy+=1;break;
+                    //I
+                    case 5:yy+=2;break;
+                    //T
+                    case 6:yy+=1;break;
+                    //两点
+                    case 7:xx+=1;yy+=2;break;
+                    //一点
+                    case 8:xx+=1;yy+=2;break;
+                    default:break;
+                }
+                boxModel.nextpaint.setColor(Config.COLORID[
+                        boxModel.nextProduceBox.getBoxTypeStrategy().getBoxType()]);
+                boxModel.nextpaint.setAlpha(128);
+                canvas.drawRect((xx)*boxNextSize + 2,
+                        yy*boxNextSize + 2,
+                        (xx+1)*boxNextSize - 2,
+                        (yy+1)*boxNextSize - 2,
+                        boxModel.nextpaint
+                );
+            }
+        }
+    }
+    //画预览方块
+    private void drawpreboxs(Canvas canvas){
+        boxModel.preboxpaint.setColor(boxModel.boxpaint.getColor());
+        boxModel.preboxpaint.setAlpha(25);
+        ArrayList<Point>preboxs=boxModel.preboxs;
+        if(preboxs!=null) {
+            //方块绘制
+            for (int i = 0; i < preboxs.size(); i++) {
+                canvas.drawRect(preboxs.get(i).x * boxSize + 2,
+                        preboxs.get(i).y * boxSize + 2,
+                        preboxs.get(i).x * boxSize + boxSize - 2,
+                        preboxs.get(i).y * boxSize + boxSize - 2,
+                        boxModel.preboxpaint);
+            }
         }
     }
 
