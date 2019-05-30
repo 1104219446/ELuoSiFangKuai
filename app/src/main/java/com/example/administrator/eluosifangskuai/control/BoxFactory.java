@@ -21,13 +21,15 @@ import java.util.Random;
  * CreateTime:2019/5/28
  */
 public class BoxFactory {
+
     private static Random random=new Random();
 
     public static ProduceBox getRandomNextBox(){
         //此处使用单例模式避免重复new
         ProduceBox nextProduceBox=ProduceBoxSingle.getInstance();
         //生成下一块方块此处降低难度暂时不要假炸弹
-        int boxNextType=random.nextInt(8);
+        //int boxNextType=getRandomBalance();
+        int boxNextType=8;
         switch (boxNextType) {
             //田
             case 0:
@@ -61,7 +63,7 @@ public class BoxFactory {
             case 7:
                 nextProduceBox.setBoxTypeStrategy(new TwoPointBox());
                 break;
-            //假炸弹
+            //炸弹
             case 8:
                 nextProduceBox.setBoxTypeStrategy(new FakeBoomBox());
                 break;
@@ -70,6 +72,16 @@ public class BoxFactory {
         Log.d("dd", "getRandomNextBox: "+boxNextType);
         nextProduceBox.getBoxTypeStrategy().setBoxType(boxNextType);
         return nextProduceBox;
+    }
+
+    public static int getRandomBalance(){
+        int ans=random.nextInt(100);
+        //炸弹出现几率为1/20
+        if(ans<5){
+            return 8;
+        }else{
+            return random.nextInt(8);
+        }
     }
 
 }

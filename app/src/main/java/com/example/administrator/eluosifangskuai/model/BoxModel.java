@@ -137,8 +137,8 @@ public class BoxModel {
     }
     //方块旋转
     public boolean rotate(MapsModel mapsModel) {
-        //如果是田字形
-        if(boxtype==0){
+        //如果是田字形或炸弹不能旋转
+        if(boxtype==0||boxtype==8){
             return false;
         }
         for(int i=0;i<boxs.length;i++) {

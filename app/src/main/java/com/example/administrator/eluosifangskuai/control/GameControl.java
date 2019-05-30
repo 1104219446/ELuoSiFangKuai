@@ -109,6 +109,33 @@ public class GameControl {
         scoreModel.addScore(lines);
     }
 
+    private void BoomClear(){
+        int minxId=0;
+        for(int i=1;i<boxModel.boxs.length;i++){
+            if(boxModel.boxs[minxId].x>boxModel.boxs[i].x){
+                minxId=i;
+            }
+        }
+        int sx=boxModel.boxs[minxId].x;
+        int sy=boxModel.boxs[minxId].y;
+        int ex=sx+3;
+        int ey=sy+2;
+        sx-=2;
+        sy-=2;
+        ex+=2;
+        ey+=2;
+        if(sx<0)sx=0;
+        if(sy<0)sy=0;
+        if(ex>Config.MAPX)ex=Config.MAPX-1;
+        if(ey>Config.MAPY)ey=Config.MAPY-1;
+        for(int i=sy;i<=ey;i++){
+            for(int j=sx;j<=ex;j++){
+                mapsModel.maps[j][i]=-1;
+            }
+        }
+        musicModel.playSounds(MusicModel.BOOM);
+    }
+
     //初始化线程
     private void initThread(){
         downThread =new Thread() {
@@ -141,17 +168,20 @@ public class GameControl {
         };
         downThread.start();
     }
-
     //方块下落逻辑处理
     private void boxsDownLogic(){
         if (!gamePause) {
             //下落一次
             if (!boxModel.move(0, 1, mapsModel)) {
-                //获取当前方块颜色
-                int colorid=boxModel.boxtype;
-                for (int i = 0; i < boxModel.boxs.length; i++) {
-                    mapsModel.maps[boxModel.boxs[i].x][boxModel.boxs[i].y]
-                            = colorid;
+                if(boxModel.boxtype==8){
+                    BoomClear();
+                }else{
+                    //获取当前方块颜色
+                    int colorid=boxModel.boxtype;
+                    for (int i = 0; i < boxModel.boxs.length; i++) {
+                        mapsModel.maps[boxModel.boxs[i].x][boxModel.boxs[i].y]
+                                = colorid;
+                    }
                 }
                 boxModel.newboxs();
                 drawControl.updatepreBoxs();
@@ -163,7 +193,6 @@ public class GameControl {
                 handler.sendMessage(msg);
         }
     }
-
     //游戏结束逻辑
     private void gameOverLogic(){
         if(gameOver) {
@@ -184,7 +213,6 @@ public class GameControl {
             timeTick =0;
         }
     }
-
     //检测是否加一行
     private void checkaddlines() {
         if(!gameOver &&!gamePause){
@@ -198,7 +226,6 @@ public class GameControl {
             }
         }
     }
-
     //下移方块
     private boolean moveButton() {
         if(boxModel.boxs==null)
@@ -207,12 +234,18 @@ public class GameControl {
         if(boxModel.move(0,1,mapsModel)) {
             return true;
         }
-        //获取当前方块颜色
-        int colorid=boxModel.boxtype;
-        //移动失败，堆积处理
-        for(int i=0;i<boxModel.boxs.length;i++) {
-            mapsModel.maps[boxModel.boxs[i].x][boxModel.boxs[i].y]=colorid;
+        //炸弹不做堆积
+        if(boxModel.boxtype==8){
+            BoomClear();
+        }else{
+            //获取当前方块颜色
+            int colorid=boxModel.boxtype;
+            //移动失败，堆积处理
+            for(int i=0;i<boxModel.boxs.length;i++) {
+                mapsModel.maps[boxModel.boxs[i].x][boxModel.boxs[i].y]=colorid;
+            }
         }
+
         //行数
         int lines;
         //消行

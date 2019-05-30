@@ -31,7 +31,7 @@ public class MusicModel {
     public static final int CLEARLINES=1;
     public static final int CLICKBUTTON=2;
     public static final int GAMEOVER=3;
-    //public static final int BGM=4;
+    public static final int BOOM=4;
     public static final int ADDLINES=5;
     public static final int LEVELUP=6;
 
@@ -46,7 +46,7 @@ public class MusicModel {
             soundsID.put(1,soundPool.load(context,R.raw.clearlines,1));
             soundsID.put(2,soundPool.load(context,R.raw.button,1));
             soundsID.put(3,soundPool.load(context,R.raw.gameover,1));
-            soundsID.put(4,soundPool.load(context,R.raw.bgm1,1));
+            soundsID.put(4,soundPool.load(context,R.raw.boom,1));
             soundsID.put(5,soundPool.load(context,R.raw.addlines,1));
             soundsID.put(6,soundPool.load(context,R.raw.levelup,1));
         }

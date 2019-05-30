@@ -28,16 +28,16 @@ import com.example.administrator.eluosifangskuai.control.GameControl;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     //游戏区域组件
-    SurfaceView gamePanel=null;
+    SurfaceView gamePanel;
     //下一块区域组件
-    SurfaceView nextPanel=null;
+    SurfaceView nextPanel;
     //游戏控制模型
-    GameControl gameControl=null;
+    GameControl gameControl;
     //主线程Handle
     public Handler handler;
     //当前分数
-    private TextView textNowScore=null;
-    private TextView textMaxScore=null;
+    private TextView textNowScore;
+    private TextView textMaxScore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
