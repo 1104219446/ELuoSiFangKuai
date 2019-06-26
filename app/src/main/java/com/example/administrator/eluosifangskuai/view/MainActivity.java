@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     String type=(String)msg.obj;
                     if(type==null)
                         return;
-                    if (type == "invalidate") {
+                    if (type.equals("invalidate")) {
                         //游戏界面刷新
                         gamePanel.invalidate();
                         //下一块界面刷新
@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //实例化游戏区域
         initGamePanel();
         //实例化下一块预览区域
-        initnextPanel();
+        initNextPanel();
         //初始化背景
         initBackground();
 
@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         layoutInfo.setPadding(0,Config.PADDING,Config.PADDING,Config.PADDING);
     }
     //实例化下一块预览区域
-    private void initnextPanel() {
+    private void initNextPanel() {
         nextPanel=new SurfaceView(this){
             @Override
             protected void onDraw(Canvas canvas) {
@@ -169,11 +169,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //点击事件
     @Override
     public void onClick(View view) {
-
         gameControl.onClick(view.getId());
         gamePanel.invalidate();
         nextPanel.invalidate();
-
     }
     //返回键停止播放音乐
     @Override

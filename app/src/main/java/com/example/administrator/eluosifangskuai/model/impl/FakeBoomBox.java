@@ -7,8 +7,6 @@ import com.example.administrator.eluosifangskuai.model.inf.BoxTypeStrategy;
 
 public class FakeBoomBox extends BaseBox implements BoxTypeStrategy {
 
-
-
     @Override
     public Point[] getBoxT() {
         return new Point[]{new Point(4,1),new Point(6,0),new Point(3,0)
