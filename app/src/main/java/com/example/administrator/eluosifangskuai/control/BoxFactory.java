@@ -23,13 +23,13 @@ import java.util.Random;
 public class BoxFactory {
 
     private static Random random=new Random();
-
+    //随机获得一个方块
     public static ProduceBox getRandomNextBox(){
         //此处使用单例模式避免重复new
         ProduceBox nextProduceBox=ProduceBoxSingle.getInstance();
         //生成下一块方块此处降低难度暂时不要假炸弹
         //int boxNextType=getRandomBalance();
-        int boxNextType=8;
+        int boxNextType=getRandomBalance();
         switch (boxNextType) {
             //田
             case 0:

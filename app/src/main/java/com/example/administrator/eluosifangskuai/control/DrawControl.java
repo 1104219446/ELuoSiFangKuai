@@ -40,7 +40,6 @@ public class DrawControl {
             boxSize=mapsModel.boxSize;
         }
     }
-
     //定位预览方块
     private boolean preMove() {
         if(boxModel.preboxs==null)
